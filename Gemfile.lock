@@ -1,0 +1,17 @@
+GIT
+  remote: git://github.com/nas/yql.git
+  revision: 783ef6a09eb0163c0d230a846103aeb3f7519db0
+  specs:
+    yql (0.0.2)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    nokogiri (1.5.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  nokogiri
+  yql!
