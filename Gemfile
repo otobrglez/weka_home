@@ -4,3 +4,7 @@ gem "nokogiri"
 #gem "rspec", :require => "spec"
 
 gem "yql", :git => 'git://github.com/nas/yql.git'
+
+gem "sqlite3"
+gem "data_mapper"
+gem "dm-sqlite-adapter"
