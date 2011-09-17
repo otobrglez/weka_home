@@ -11,14 +11,23 @@ require 'dm-migrations'
 require 'digest/sha1'
 
 
-DataMapper::Logger.new($stdout, :debug)
+# DataMapper::Logger.new($stdout, :debug)
 DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/cache.db")
 
 class Page
   include DataMapper::Resource
-  property :id,         Serial    # An auto-increment integer key
-  property :hash_key,   String    # A varchar type string, for short strings
-  property :body,       Text      # A text block, for longer string data.
+  property :id,         Serial
+  property :hash_key,   String
+  property :body,       Text
+end
+
+class Estate
+  include DataMapper::Resource
+  property :id,         Serial
+  property :Price,   	Float
+  property :Size,       Float
+  property :Place,      String 
+  property :Location,   String
 end
 
 DataMapper.finalize
@@ -28,6 +37,8 @@ DataMapper.auto_upgrade!
 
 # Fetch records with YQL or from sqlite3 database
 def get_yql(ql)
+
+	puts "YQL: #{ql}"
 
 	hash_key = Digest::SHA1.hexdigest(ql)
 	page = Page.first(:hash_key => hash_key)
@@ -98,9 +109,12 @@ f.puts "@ATTRIBUTE Lokacija {"+lokacije.join(",")+"}"
 
 f.puts "@DATA"
 
+Estate.all.destroy
+
 data.each do |loc|
 	if top_locations.include? loc[:Location]
 		f.puts("#{loc[:Price]},#{loc[:Size]},#{loc[:Place]},#{loc[:Location]}")
+		estate = Estate.create(loc)
 	end
 end
 
