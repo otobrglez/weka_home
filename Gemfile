@@ -8,3 +8,6 @@ gem "yql", :git => 'git://github.com/nas/yql.git'
 gem "sqlite3"
 gem "data_mapper"
 gem "dm-sqlite-adapter"
+gem "google_prediction"
+gem "gdata"
+gem "activesupport"

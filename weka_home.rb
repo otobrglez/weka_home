@@ -11,7 +11,7 @@ require 'dm-migrations'
 require 'digest/sha1'
 
 
-# DataMapper::Logger.new($stdout, :debug)
+DataMapper::Logger.new($stdout, :debug)
 DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/cache.db")
 
 class Page
@@ -67,7 +67,7 @@ end
 # Fetch number of records
 def get_pages(q="stanovanje")
 	get_yql("select href from html where
-	url='http://www.gohome.si/nepremicnine.aspx?q=stanovanje'
+	url='http://www.gohome.si/nepremicnine.aspx?q=#{q}'
 	and xpath=\"//div[@id='paging']//span[last()]/a[last()]\"")["href"].split("=").last.to_i
 end
 
@@ -92,17 +92,20 @@ def row2row(rows)
 end
 
 # Get some records
-data = [get_by_field("stanovanje"),get_by_field("hiša")].flatten!
+data = [get_by_field("stanovanje"),get_by_field("hiša"),get_by_field("zemljišče")].flatten! #,get_by_field("zemljišče")
 
 # Start writing *.arff file for WEKA
-f = File.new("gohome.arff", "w+") 
+f = File.new("gohome.arff", "w+")
+gdata = File.new("gohome.csv", "w+")
+
 
 f.puts "@RELATION iris"
 f.puts "@ATTRIBUTE Cena	REAL"
 f.puts "@ATTRIBUTE Size REAL"
 f.puts "@ATTRIBUTE Place {Stanovanje,Hiša}"
 
-top_locations = %w(LJUBLJANA MARIBOR CELJE KRANJ VELENJE KOPER PTUJ TRBOVLJE KAMNIK)
+top_locations = %w(LJUBLJANA MARIBOR CELJE KRANJ VELENJE KOPER PTUJ TRBOVLJE KAMNIK LUCIJA LOGATEC)
+# top_locations = %w(LJUBLJANA MARIBOR CELJE)
 
 lokacije = ((data.map { |l| l[:Location] }).uniq!.sort!).find_all {|l| top_locations.include? l }
 f.puts "@ATTRIBUTE Lokacija {"+lokacije.join(",")+"}"
@@ -114,7 +117,9 @@ Estate.all.destroy
 data.each do |loc|
 	if top_locations.include? loc[:Location]
 		f.puts("#{loc[:Price]},#{loc[:Size]},#{loc[:Place]},#{loc[:Location]}")
-		estate = Estate.create(loc)
+		gdata.puts "#{loc[:Price]},#{loc[:Size]},\"#{loc[:Place]}\",\"#{loc[:Location]}\""
+
+		# estate = Estate.create(loc)
 	end
 end
 
